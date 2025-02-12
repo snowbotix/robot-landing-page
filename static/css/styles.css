@@ -1,0 +1,334 @@
+body {
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+    background-color: #121212;
+    color: white;
+    display: grid;
+    grid-template-areas:
+        "header header"
+        "sidebar content";
+    grid-template-columns: 58px 1fr;
+}
+
+.topbar {
+    grid-area: header;
+    background-color: #1e1e1e;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0 10px;
+    color: white;
+    font-size: 16px;
+    height: 58px;
+    border-radius: 28px;
+    margin: 10px 10px;
+  }
+
+.logo {
+    position: absolute;
+    left: 20px;
+}
+.logo img {
+    height: 30px;
+    width: auto;
+}
+
+.RIN {
+    font-size: 18px;
+    color: #fff;
+}
+.sidebar-container {
+    display: flex;
+    align-items: center ; /* Centers vertically */
+    height: calc(100vh - 58px - 20px); /* Full viewport height to center vertically */
+    background-color: #121212;
+}
+
+.sidebar {
+    grid-area: sidebar;
+    background-color: #1e1e1e;
+    justify-content: center;
+    height: 350px;
+    width: 58px;
+    margin: 10px;
+    border-radius: 28px;
+}
+
+.sidebar-icon {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* Center vertically in the sidebar */
+    align-items: center; /* Center horizontally in the sidebar */
+    height: 100%;
+    width: 58px;
+}
+.sidebar-icon li {
+    margin-bottom: 5px;
+    margin-top: 5px;
+}
+
+.sidebar-icon img {
+    width: 50px;
+    cursor: pointer;
+}
+
+/* Hover text styling */
+.hover-text {
+    position: absolute;
+    top: 50%;
+    left: 70px; /* Position the text outside the sidebar */
+    transform: translateY(-50%);
+    background-color: #333;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap; /* Prevent text from wrapping */
+    visibility: hidden; /* Hide initially */
+    opacity: 0; /* Make invisible initially */
+    transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;
+}
+.icon-item {
+    position: relative;
+    margin: 10px 0;
+}
+
+/* Show hover text on hover */
+.icon-item:hover .hover-text {
+    visibility: visible;
+    opacity: 1;
+}
+
+.battery-dashboard {
+    grid-area: content;
+    background-color: #1e1e1e;
+    margin-top: 10px;
+    margin-bottom: 30px;
+    margin-left: 25px;
+    border-radius: 28px;
+    width: 450px;
+}
+
+.battery-dashboard .battery-icon {
+    width: 40px;
+    height: auto;
+    margin-right: 10px;
+}
+
+.battery-dashboard .header {
+    display : flex;
+    font-size: 32px;
+    margin-top: 10px;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+}
+
+.sidebar-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.section-box {
+    background-color: #2e2e2e; /* Background color for the section boxes */
+    border-radius: 20px; /* Rounded corners */
+    padding: 15px; /* Padding inside the boxes */
+    flex: 1; /* Allow boxes to grow equally */
+    margin: 0 10px; /* Margin between the boxes */
+    color: #fff; /* Text color */
+    text-align: center;
+}
+
+.section-box:first-child {
+    margin-top: 10px;
+    margin-bottom: 10px; /* Add margin below the first section box */
+}
+
+
+.section-box h3 {
+    margin: 0; /* Remove default margin */
+    font-size: 24px; /* Font size for section titles */
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px; /* Width of the switch */
+    height: 34px; /* Height of the switch */
+}
+
+.switch input {
+    opacity: 0; /* Hide the default checkbox */
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc; /* Background color of the switch */
+    transition: .4s; /* Transition effect */
+    border-radius: 34px; /* Rounded corners */
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px; /* Height of the toggle */
+    width: 26px; /* Width of the toggle */
+    left: 4px; /* Position of the toggle */
+    bottom: 4px; /* Position of the toggle */
+    background-color: white; /* Color of the toggle */
+    transition: .4s; /* Transition effect */
+    border-radius: 50%; /* Rounded toggle */
+}
+
+/* Change the background color when checked */
+input:checked + .slider {
+    background-color: #2196F3; /* Color when checked */
+}
+
+/* Move the toggle when checked */
+input:checked + .slider:before {
+    transform: translateX(26px); /* Move the toggle */
+}
+
+.battery-values {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex; /* Ensures the items are aligned horizontally by default */
+    flex-direction: column;
+    align-items: center; /* Align items vertically */
+    gap: 10px
+}
+
+.battery-values li {
+    display: flex; /* Use flexbox for individual list items */
+    flex-direction: row; /* Stack the image and text vertically */
+    align-items: center; /* Center align the image and text */
+}
+
+.battery-values img {
+    width: 40px; /* Adjust the icon size */
+    margin-right: 10px;
+}
+
+.battery-values span {
+    font-size: 18px; /* Adjust text size */
+    color: #fff; /* Ensure the text color matches your design */
+}
+
+.Signal-Strength {
+    position: absolute;
+    font-size: 18px;
+    right: 20px;
+}
+
+.current-time {
+    position: absolute;
+    right: 450px;
+    display: flex;
+    align-items: center;
+    color: white;
+    font-size: 16px;
+}
+
+.current-time img {
+    height: 50px;
+    width: auto;
+}
+
+#time-display {
+    font-weight: bold;
+}
+
+.robot-time {
+    position: absolute;
+    right: 300px;
+    display: flex;
+    align-items: center;
+    color: white;
+    font-size: 16px;
+}
+
+.robot-time img {
+    height: 50px;
+    width: auto;
+}
+
+#robot-time-display {
+    font-weight: bold;
+}
+
+.robot-container {
+    position: absolute; /* Use absolute positioning */
+    bottom: 5px; /* Adjust the bottom offset */
+    right: 20px; /* Adjust the right offset */
+    z-index: 10; /* Ensure it appears above other elements */
+    width: 500px; /* Set a fixed width for the image container */
+    height: auto; /* Maintain aspect ratio */
+}
+
+.robot-image {
+    width: 100%; /* Make the image responsive */
+    height: auto; /* Maintain aspect ratio */
+}
+
+.location-information-box {
+    grid-area: content;
+    position: absolute; /* Position it independently of other sections */
+    top: 85px; /* Adjust the top distance */
+    right: 15px; /* Align to the right edge */
+    background-color: #1e1e1e; /* Match the dashboard theme */
+    border-radius: 28px; /* Rounded corners for consistency */
+    padding: 20px; /* Internal padding */
+    width: 500px; /* Fixed width */
+    height: 240px;
+}
+
+.location-information-box .location-icon {
+    width: 40px;
+    height: auto;
+    margin-right: 10px;
+}
+
+.location-information-box .header {
+    display : flex;
+    font-size: 32px;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+}
+
+.map-container {
+    width: 100%; /* Full width within the container */
+    height: 70%; /* Height relative to the container */
+    border-radius: 20px; /* Rounded corners */
+    margin-top: 10px; /* Space below the header */
+    border: 1px solid #444; /* Optional: border for better visibility */
+}
+
+#map {
+    width: 100%; /* Full width within the container */
+    height: 70%;
+    border-radius: 20px; /* Rounded corners */
+}
+
+
+.location-information-box .footer img {
+    width: 25px; /* Set the icon width */
+    height: auto; /* Maintain aspect ratio */
+    margin-right: 5px; /* Add spacing between the icon and text */
+}
+

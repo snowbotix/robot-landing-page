@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Battery Data Display</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        h1 {
+            text-align: center;
+            margin-top: 10px;
+            color: #333;
+        }
+
+        #batteryData {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            margin-top: 10px;
+        }
+
+        .battery-info {
+            background-color: #fff;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 600px;
+        }
+
+        .battery-info h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 1.5em;
+        }
+
+        .battery-info p {
+            margin: 5px 0;
+            font-size: 1.1em;
+            color: #34495e;
+        }
+
+        .battery-info span {
+            font-weight: bold;
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1.2em;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        button:focus {
+            outline: none;
+        }
+
+        button:active {
+            background-color: #1d6f99;
+        }
+        .toggle-button {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        .toggle-button input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #4CAF50;
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        .toggle-button-on {
+        background-color: #4CAF50; /* Green */
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 5px;
+        cursor: pointer;
+        border-radius: 5px;
+        }
+    
+        .toggle-button-off {
+            background-color: #f44336; /* Red */
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+    
+        .toggle-button-on:hover {
+            background-color: #45a049;
+        }
+    
+        .toggle-button-off:hover {
+            background-color: #d32f2f;
+        }
+    </style>
+</head>
+<body>
+    <h1>Landing Page MVP SMUR</h1>
+    <div id="batteryData">
+        <!-- Battery data will be populated here by JavaScript -->
+    </div>
+
+    <script>
+        // Fetch and update battery data
+        function fetchBatteryData() {
+            fetch('/get_battery_data')
+                .then(response => response.json())
+                .then(data => {
+                    console.log("Fetched Battery Data:", data);
+                    const batteryDataDiv = document.getElementById('batteryData');
+
+                    if (data['12V'] && data['48V']) {
+                        const twelveVDiv = document.querySelector('#batteryData .twelveV');
+                        const fortyEightVDiv = document.querySelector('#batteryData .fortyEightV');
+
+                        const twelveVContent = `
+                            <h2>12V Battery</h2>
+                            <p><span>Voltage:</span> ${data['12V']['voltage']} V</p>
+                            <p><span>Current:</span> ${data['12V']['current']} A</p>
+                            <p><span>State of Charge:</span> ${data['12V']['soc']}%</p>
+                            <p><span>Temperature:</span> ${data['12V']['temperatures']}°C</p>
+                            <p><span>Discharge:</span> ${data['12V']['switches']['discharge'] ? 'True' : 'False'}</p>
+                            <p><span>Charge:</span> ${data['12V']['switches']['charge'] ? 'True' : 'False'}</p>
+                            <p>12V System: <span id="system12VStatus">Unknown</span></p> 
+                            <p>DC Charger Status: <span id="dcChargerStatus">Unknown</span></p>
+                            <p>E Stop Status: <span id="systemEStopStatus">Unknown</span></p>
+                            <p>Nvidia Status: <span id="NvidiaStatus">Unknown</span></p>
+                            <p>Heater Status: <span id="HeaterStatus">Unknown</span></p>
+                            <button id="E-Stop" onclick="toggleEStop()">
+                                    Toggle E Stop
+                                </button>
+                                <button id="toggle12VSystem" onclick="toggleRelay('toggle12VSystem')">
+                                    Toggle 12V System
+                                </button>
+                                <button id="toggleNvidia" onclick="toggleRelay('toggleNvidia')">
+                                    Toggle Nvidia
+                                </button>
+                        `;
+
+                        const fortyEightVContent = `
+                            <h2>48V Battery</h2>
+                            <p><span>Voltage:</span> ${data['48V']['voltage']} V</p>
+                            <p><span>Current:</span> ${data['48V']['current']} A</p>
+                            <p><span>State of Charge:</span> ${data['48V']['soc']}%</p>
+                            <p><span>Temperature:</span> ${data['48V']['temperatures']}°C</p>
+                            <p><span>Discharge:</span> ${data['48V']['switches']['discharge'] ? 'True' : 'False'}</p>
+                            <p><span>Charge:</span> ${data['48V']['switches']['charge'] ? 'True' : 'False'}</p>
+                            <td>
+                                <div>Discharge</div>
+                                <button class="toggle-button-on" onclick="togglePin48VDischarge('on')">On</button>
+                                <button class="toggle-button-off" onclick="togglePin48VDischarge('off')">Off</button>
+                            </td>
+                        `;
+
+                        if (twelveVDiv) {
+                            twelveVDiv.innerHTML = twelveVContent;
+                        } else {
+                            batteryDataDiv.innerHTML += `
+                                <div class="battery-info twelveV">
+                                    <h3>12V Battery</h3>
+                                    ${twelveVContent}
+                                </div>
+                            `;
+                        }
+
+                        if (fortyEightVDiv) {
+                            fortyEightVDiv.innerHTML = fortyEightVContent;
+                        } else {
+                            batteryDataDiv.innerHTML += `
+                                <div class="battery-info fortyEightV">
+                                    <h3>48V Battery</h3>
+                                    ${fortyEightVContent}
+                                </div>
+                            `;
+                        }
+                        // Set toggle states based on fetched data
+                        // document.getElementById('toggle-12V-discharge').checked = data['12V']['switches']['discharge'];
+                        // document.getElementById('toggle-12V-charge').checked = data['12V']['switches']['charge'];
+                        // document.getElementById('toggle-48V-discharge').checked = data['48V']['switches']['discharge'];
+                        // document.getElementById('toggle-48V-charge').checked = data['48V']['switches']['charge'];
+                    } else {
+                        batteryDataDiv.innerHTML = '<p>No data available</p>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching battery data:', error);
+                    document.getElementById('batteryData').innerHTML = '<p>Error fetching data</p>';
+                });
+        }
+
+        function toggleRelay(relayName) {
+            fetch('/toggle_relay', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ relay: relayName })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log(`${relayName} toggled`);
+                    // Update the UI for the specific relay
+                    const statusElement = {
+                        'toggle12VSystem': 'system12VStatus', 'toggleNvidia': 'NvidiaStatus'
+                    }[relayName];
+                    document.getElementById(statusElement).textContent = data.state ? 'On' : 'Off';
+                } else {
+                    console.error(`Failed to toggle ${relayName}`);
+                }
+            })
+            .catch(error => {
+                console.error('Error toggling relay:', error);
+            });
+        }
+            function fetchRelayStatus() {
+              fetch('/relay_status')
+                  .then(response => response.json())
+                  .then(status => {
+                      document.getElementById('system12VStatus').textContent = status.toggle12VSystem ? 'On' : 'Off';
+                      document.getElementById('dcChargerStatus').textContent = status.toggleDCCharger ? 'On' : 'Off';
+                      document.getElementById('systemEStopStatus').textContent = status.toggleEStop ? 'On' : 'Off';
+                      document.getElementById('NvidiaStatus').textContent = status.toggleNvidia ? 'On' : 'Off';
+                      document.getElementById('HeaterStatus').textContent = status.toggleHeater ? 'On' : 'Off';
+                  })
+                  .catch(error => {
+                      console.error('Error fetching relay status:', error);
+                      
+                  });
+        }
+
+        // Fetch statuses periodically
+        setInterval(fetchRelayStatus, 20);
+
+        
+        // Function to toggle the E-Stop relay (GPIO Pin P29 / GPIO 5)
+        function toggleEStop() {
+            // Send a POST request to toggle the relay
+            fetch('/toggle_estop', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ action: 'toggle' }) // send toggle action
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('E-Stop toggled');
+                } else {
+                    console.error('Failed to toggle E-Stop');
+                }
+            })
+            .catch(error => {
+                console.error('Error toggling E-Stop:', error);
+            });
+        }
+
+        // Function to toggle discharge for 48V Battery
+        function togglePin48VDischarge(status) {
+            fetch('/toggledischarge48v', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ status: status })
+            }).then(response => response.json())
+              .then(data => {
+                  if (data.success) {
+                      console.log('48V Discharge Pin toggled successfully');
+                  } else {
+                      console.error('Failed to toggle pin');
+                  }
+              });
+        }
+        // Function to toggle charge for 48V Battery
+        function togglePin48VCharge(status) {
+            fetch('/togglecharge48v', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ battery: '48v', charge: true, status: status })
+            }).then(response => response.json())
+              .then(data => {
+                  if (data.success) {
+                      console.log('48 Charge Pin toggled successfully');
+                  } else {
+                      console.error('Failed to toggle pin');
+                  } 
+              }); 
+        }
+        
+        // Function to toggle discharge for 48V Battery
+        function togglePin12VDischarge(status) {
+            fetch('/toggledischarge12v', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ battery: '12v', discharge: true, status: status })
+            }).then(response => response.json())
+              .then(data => {
+                  if (data.success) {
+                      console.log('12 Discharge Pin toggled successfully');
+                  } else {
+                      console.error('Failed to toggle pin');
+                  }
+              });
+        }
+        // Function to toggle charge for 48V Battery
+        function togglePin12VCharge(status) {
+            fetch('/togglecharge12v', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ battery: '12v', charge: true, status: status })
+            }).then(response => response.json())
+              .then(data => {
+                  if (data.success) {
+                      console.log('12 charge Pin toggled successfully');
+                  } else {
+                      console.error('Failed to toggle pin');
+                  }
+              });
+        }
+        
+
+        // Update the battery data 
+        setInterval(fetchBatteryData, 2000);
+        fetchBatteryData();  // Initial fetch
+    </script>
+</body>
+</html>

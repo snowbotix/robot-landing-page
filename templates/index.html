@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- Header -->
+<head>
+    <!-- Character Encoding for the document -->
+    <meta charset="UTF-8">
+    <!-- Viewport settings for responsive design -->
+    <meta name="viewport" content = "width=device-width, initial-scale=1.0">
+    <!-- Document Title being displayed in browers tab -->
+    <Title>SnowBotix Robot Landing Page </Title>
+    <!-- Linking the stylesheet for User Interface Design -->
+    <link rel="stylesheet" href="static/css/styles.css">
+    <!-- Linking the leaflet CSS for map display using Open Street Map Database  -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <!-- Linking the leaflet JS for map display using Open Street Map Database  -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+</head>
+<!-- Body -->
+<body>
+    <!-- Topbar section containing logo, signal strength, and current time display -->
+    <div class="topbar">
+        <div class="logo">
+            <img src="static/images/SnowBotix_Logo.png" alt="SnowBotix Logo" />
+        </div>
+        <div class="RIN">RIN: SMUR02STD151124-001</div>
+        <div class="Signal-Strength"> Signal Strength: Excellent</div>
+        <div class="current-time">
+            <img src="static/icons/clock.png" alt="Current Time" />
+            <span id="time-display"></span>
+        </div>
+        <div class="robot-time">
+            <img src="static/icons/forklift-tracktor.png" alt="Robot Time" />
+            <span id="robot-time-display"></span>
+        </div>
+    </div>
+    <!-- Sidebar container for navigation icons -->
+    <div class="sidebar-container">
+        <div class="sidebar">
+            <ul class="sidebar-icon">
+                <li class="icon-item">
+                    <img src='static/icons//home.png' alt = 'Home Icon'>
+                    <span class="hover-text">Home</span>
+                </li>
+                <li class="icon-item">
+                    <img src='static/icons/shutdown.png' alt = 'Power Icon'>
+                    <span class="hover-text">Power On Nvidia</span>
+                </li>
+                <li class="icon-item">
+                    <a href="http://192.168.1.1" target="_blank">
+                        <img src='static/icons/network--v2.png' alt = 'Network Icon'>
+                    </a>
+                    <span class="hover-text">Teltonika Web Interface</span>
+                </li>
+                <li class="icon-item">
+                    <a href="http://192.168.1.162" target="_blank">
+                        <img src='static/icons/worldwide-location.png' alt = 'GNSS Icon'>
+                    </a>
+                    <span class="hover-text">GNSS Web Interface</span>
+                </li>
+                <li class="icon-item">
+                    <a href="http://192.168.1.162" target="_blank">
+                        <img src='static/icons/motorcontroller.png' alt = 'Motor Controller Icon'>
+                    </a>
+                    <span class="hover-text">Turn On Motor</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <!-- Battery dashboard section for monitoring robot battery systems -->
+    <div class ='battery-dashboard'>
+        <div class="header">
+            <img src="static/icons/full-battery.png" alt="Battery Icon" class="battery-icon">
+            <span>Battery Dashboard</span>
+        </div>
+        <div class="section-container">
+            <div class="section-box">
+                <h3>48V Battery</h3>
+                <hr>
+                <label class = "switch">
+                    <input type="checkbox" id="48v-switch" onchange="togglePin(this.checked ? 'on' : 'off')" >
+                    <span class ="slider"></span>
+                </label>
+                <ul class="battery-values">
+                    <li>
+                        <img src='static/icons/percentage.png' alt="Percentage Icon">
+                        <span id="48v-soc">SOC: --%</span>
+                    </li>
+                    <li>
+                        <img src='static/icons/carbon-brush.png' alt="Current Icon">
+                        <span id="48v-current">Current: --A</span>
+                    </li>
+                    <li>
+                        <img src='static/icons/temperature.png' alt="Temperature Icon">
+                        <span id="48v-temperature">Temperature: -- C</span>
+                    </li>
+                    <li>
+                        <img src='static/icons/voltage.png' alt="Power Consumption Icon">
+                        <span id="48v-voltage">Voltage: -- V</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="section-box">
+                <h3>12V Battery</h3>
+                <hr>
+                <ul class="battery-values">
+                    <li>
+                        <span id="12v-discharge-switch-state">Discharge Switch State:  </span>
+                        <span id="12v-charge-switch-state">Charge Switch State:  </span>
+                    </li>
+                    <li>
+                        <img src='static/icons/percentage.png' alt="Percentage Icon">
+                        <span id="12v-soc" >SOC: --%</span>
+                    </li>
+                    <li>
+                        <img src='static/icons/carbon-brush.png' alt="Current Icon">
+                        <span id="12v-current" >Current: --A</span>
+                    </li>
+                    <li>
+                        <img src='static/icons/temperature.png' alt="Temperature Icon">
+                        <span id="12v-temperature" >Temperature: -- C</span>
+                    </li>
+                    <li>
+                        <img src='static/icons/voltage.png' alt="Power Consumption Icon">
+                        <span id="12v-voltage" >Voltage: -- V</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!-- Robot image display container -->
+    <div class="robot-container">
+        <img src ="static/images/Smur-2.0_Straight_Blade_IsometricView.PNG" alt="Robot Image" class="robot-image"/>
+    </div>
+    <!-- Location information box with map for displaying GNSS data -->
+    <div class="location-information-box">
+        <div class="header">
+            <img src="static/icons/location--v2.png" alt="Location Icon" class="location-icon">
+            <span>Location Information</span>
+        </div>
+        <div id="map" class="map-container"></div>
+        <div class="footer">
+            <img src="static/icons/location-marker.png" alt="marker Icon" class="'marker-Icon">
+            <span>Latitude: 37.7749, Longitude: -122.4194</span>
+        </div>
+    </div>
+    <!-- Weather information section -->
+    <div class="weather-information">
+    </div>
+
+    <!-- Linking the jQuery JS for DOM manipulation and event handling -->
+    <script src="static/js/scripts.js"></script>
+</body>
+
+</html>
