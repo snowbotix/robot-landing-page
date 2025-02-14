@@ -25,3 +25,4 @@
 - Show the VIN of Robot
 - Show weather the robot is active or standby
 
+<img width="500" alt="Screenshot 2025-02-14 at 10 40 43 AM" src="https://github.com/user-attachments/assets/67bd7205-e8d9-43d5-a43d-6357ab1dc956" />
