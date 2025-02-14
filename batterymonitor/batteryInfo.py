@@ -241,7 +241,7 @@ def insert_data(data_12V, data_48V):
     #define global variables for Solid State Relay Pins - BCM
     global RELAY_HEATING, RELAY_DC_CHARGER, RELAY_12V, ESTOP_GPIO_PIN, RELAY_NVIDIA
     #Connect to the SQLite database 
-    conn = sqlite3.connect('/home/bms/Battery_Landing_Page/Landing_Page_v2/database/smur1.2_data.db')  #Connect to the database path
+    conn = sqlite3.connect('robot-landing-page/database/smur1.2_data.db')  #Connect to the database path
     cursor = conn.cursor() #Create a cursor object to interact with the database
     
     #Get the current datetime
@@ -266,8 +266,8 @@ def insert_data(data_12V, data_48V):
     #Insert the data into database using cursor object for interaction 
     cursor.execute('''
            INSERT INTO smur_data (timestamp, voltage_12V, current_12V, soc_12V, charge_switch_12V, discharge_switch_12V, temperature_12V,
-                                  voltage_48V, current_48V, soc_48V, charge_switch_48V, discharge_switch_48V, temperature_48V_Cell1, temperature_48V_Cell2, relay_heating_pad, relay_dc_charger, relay_12v_system, relay_estop, relay_nvidia)                                                 temperature_48V_Cell3)
-           VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                                  voltage_48V, current_48V, soc_48V, charge_switch_48V, discharge_switch_48V, temperature_48V_Cell1, temperature_48V_Cell2, temperature_48V_Cell3, relay_heating_pad, relay_dc_charger, relay_12v_system, relay_estop, relay_nvidia)                                                 temperature_48V_Cell3)
+           VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
     ''',
     (current_timestamp, B_12V_Volt, B_12V_Current, B_12V_Soc, B_12V_switch_State_Charge, B_12V_switch_State_Discharge, B_12V_Temperature,
      B_48V_Volt, B_48V_Current, B_48V_Soc, B_12V_switch_State_Charge, B_48V_Switch_State_Discharge, B_48V_Temperature_Cell1, B_48V_Temperature_Cell2, B_48V_Temperature_Cell3, GPIO.input(RELAY_HEATING), GPIO.input(RELAY_DC_CHARGER), GPIO.input(RELAY_12V), GPIO.input(ESTOP_GPIO_PIN), GPIO.input(RELAY_NVIDIA)
@@ -326,6 +326,9 @@ async def main():
     # Configure the GPIO Pins
     GPIO.setup(RELAY_DC_CHARGER, GPIO.OUT) #Set the GPIO Pin of DC Charger
     GPIO.setup(RELAY_HEATING, GPIO.OUT) #Set the GPIO Pin of Heating
+    GPIO.setup(RELAY_12V, GPIO.OUT) #Set the GPIO Pin for 12V System
+    GPIO.setup(ESTOP_GPIO_PIN, GPIO.OUT) #Set the GPIO Pin for Estop
+    GPIO.setup(RELAY_NVIDIA, GPIO.OUT) #Set the GPIO Pin for Nvidia
 
     #Initialize the GPIO Pins as Off While starting the script
     GPIO.output(RELAY_DC_CHARGER, GPIO.LOW)  # Initialize DC Charger off
