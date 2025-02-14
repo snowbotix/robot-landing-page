@@ -1,11 +1,11 @@
 #!/bin/bash
 
 #Activate the virtual environment
-source /home/bms/Battery_Landing_Page/Landing_Page_v2/lpenv/bin/activate
+source robot-landing-page/lpenv/bin/activate
 
 #Run the flask web app
-python3 /home/bms/Battery_Landing_Page/Landing_Page_v2/app.py > /home/bms/Battery_Landing_Page/Landing_Page_v2/app.log 2>&1 &
+python3 robot-landing-page/app.py > robot-landing-page/app.log 2>&1 &
 
 
 #Run the batterymonitor script
-python3 /home/bms/Battery_Landing_Page/Landing_Page_v2/batterymonitor/batteryInfo.py
+python3 robot-landing-page/batterymonitor/batteryInfo.py
