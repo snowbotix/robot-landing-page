@@ -25,6 +25,7 @@
 - Show the VIN of Robot
 - Show weather the robot is active or standby
 
-<img src="[images/logo.png](https://github.com/user-attachments/assets/87f5160b-3ed8-40c4-abc8-5ccda569e8a9)" alt="Logo" width="200" height="100"/>
+<img src="![IMG_3580](https://github.com/user-attachments/assets/06a4bd0b-3bc2-4504-8f77-89f9236f782f)" alt="Logo" width="200" height="100"/>
+
 
 
