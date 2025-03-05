@@ -241,7 +241,7 @@ def insert_data(data_12V, data_48V):
     #define global variables for Solid State Relay Pins - BCM
     global RELAY_HEATING, RELAY_DC_CHARGER, RELAY_12V, ESTOP_GPIO_PIN, RELAY_NVIDIA
     #Connect to the SQLite database 
-    conn = sqlite3.connect('robot-landing-page/database/smur1.2_data.db')  #Connect to the database path
+    conn = sqlite3.connect('/home/smur1.2/robot-landing-page/database/smur1.2_data.db')  #Connect to the database path
     cursor = conn.cursor() #Create a cursor object to interact with the database
     
     #Get the current datetime
@@ -266,7 +266,7 @@ def insert_data(data_12V, data_48V):
     #Insert the data into database using cursor object for interaction 
     cursor.execute('''
            INSERT INTO smur_data (timestamp, voltage_12V, current_12V, soc_12V, charge_switch_12V, discharge_switch_12V, temperature_12V,
-                                  voltage_48V, current_48V, soc_48V, charge_switch_48V, discharge_switch_48V, temperature_48V_Cell1, temperature_48V_Cell2, temperature_48V_Cell3, relay_heating_pad, relay_dc_charger, relay_12v_system, relay_estop, relay_nvidia)                                                 temperature_48V_Cell3)
+                                  voltage_48V, current_48V, soc_48V, charge_switch_48V, discharge_switch_48V, temperature_48V_Cell1, temperature_48V_Cell2, temperature_48V_Cell3, relay_heating_pad, relay_dc_charger, relay_12v_system, relay_estop, relay_nvidia)
            VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
     ''',
     (current_timestamp, B_12V_Volt, B_12V_Current, B_12V_Soc, B_12V_switch_State_Charge, B_12V_switch_State_Discharge, B_12V_Temperature,
@@ -326,16 +326,16 @@ async def main():
     # Configure the GPIO Pins
     GPIO.setup(RELAY_DC_CHARGER, GPIO.OUT) #Set the GPIO Pin of DC Charger
     GPIO.setup(RELAY_HEATING, GPIO.OUT) #Set the GPIO Pin of Heating
-    GPIO.setup(RELAY_12V, GPIO.OUT) #Set the GPIO Pin for 12V System
-    GPIO.setup(ESTOP_GPIO_PIN, GPIO.OUT) #Set the GPIO Pin for Estop
-    GPIO.setup(RELAY_NVIDIA, GPIO.OUT) #Set the GPIO Pin for Nvidia
+    GPIO.setup(RELAY_12V, GPIO.OUT) #Set the GPIO Pin of 12V System
+    GPIO.setup(ESTOP_GPIO_PIN, GPIO.OUT) #Set the GPIO Pin of E Stop 
+    GPIO.setup(RELAY_NVIDIA, GPIO.OUT) #Set the GPIO Pin of Nvidia Computer
 
     #Initialize the GPIO Pins as Off While starting the script
     GPIO.output(RELAY_DC_CHARGER, GPIO.LOW)  # Initialize DC Charger off
     GPIO.output(RELAY_HEATING, GPIO.LOW)  # Initialize Heater off
 
     #Initialize the Battery Switch States 
-    await Bms48V.set_switch('charge',False) #Set the 48V Battery Discharge as OFF
+    await Bms48V.set_switch('charge',False) #Set the 48V Battery Charge as OFF
     await Bms12V.set_switch('charge',False) #Set the 12V Battery Charge as OFF
     await Bms12V.set_switch('discharge',True) #Set the 12V Battery Dicharge as ON
 
@@ -424,20 +424,20 @@ async def main():
         # Auto Charging Algoritm
         # 12V Battery Charging using 48V Battery using a custom Logic
         #Check for 48V Battery SOC if it is more than 30% then only charge the 12V Battery
-        if B_48V_Soc >= 30:
+        if B_48V_Soc >= 25:
 
             #Charging Conditions Algo
             #Check if 12V Battery State of Charge is less than 20 or the voltage is less than 11.8
-            if B_12V_Volt <= 11.8 or B_12V_Soc <= 20:
+            if B_12V_Volt <= 12.5 or B_12V_Soc <= 20:
                 
                 # Temperature Control Algorithm
                 # Check if the temperature of 12V Battery is less than 4
-                if B_12VTemp[0] < 4:
+                if B_12VTemp[0] < 3:
                     #Set the heating pad on to raise the battery temperature for charging
                     GPIO.output(RELAY_HEATING, GPIO.HIGH) #GPIO High for Heater Pad to turn on 
                     print("Turned On Heating") #Print on console for debugging and monitoring
                 #Check if the temeprature of 12V Battery is more than 5
-                elif B_12VTemp[0] > 5:
+                elif B_12VTemp[0] > 3.5:
                     #Set the heating pad off to lower the battery temperature for charging
                     GPIO.output(RELAY_HEATING, GPIO.LOW) #GPIO Low for Heater pad to turn off
                     print("Turned Off Heating") #Print on console for debugging and monitoring
@@ -460,7 +460,7 @@ async def main():
             
             #Charging Conditions Off Algorithm
             #Before switching off the charging algo, Check if the 12V Battery State of Charge is more than equal to 99 or 12 V Battery Voltage is greater than 14
-            elif B_12V_Volt >= 14 or B_12V_Soc >= 99:
+            elif B_12V_Volt >= 13.6 or B_12V_Soc >= 100:
                 # Check current status of the 12V charge switch before setting it
                 if Data_12V.switches['charge']:  # Check if the 12V charge switch is on
                     await Bms12V.set_switch('charge', False)  # Turn off the 12V charge switch
@@ -476,7 +476,7 @@ async def main():
                     await Bms48V.set_switch('discharge', False) #Set the discharge switch of 48V to off
                     print("Turned Off 48V Discharge")
         else:
-            if B_48V_Soc < 30:
+            if B_48V_Soc < 25:
                 #Turn off the 12v charge switch
                 if Data_12V.switches['charge']:
                     await Bms12V.set_switch('charge', False)  # Turn off the 12V charge switch
