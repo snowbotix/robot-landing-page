@@ -1,0 +1,11 @@
+[Service]
+ExecStart = ssh srv.us -o StrictHostKeyChecking=accept-new -o ServerAliveInterval=5 -T -R snowbotix:80:192.168.1.209:5002
+User = smur1.2
+Restart = on-failure
+RestartSec = 1s
+
+[Unit]
+After=network.target
+
+[Install]
+WantedBy = multi-user.target
