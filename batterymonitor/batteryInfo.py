@@ -241,7 +241,7 @@ def insert_data(data_12V, data_48V):
     #define global variables for Solid State Relay Pins - BCM
     global RELAY_HEATING, RELAY_DC_CHARGER, RELAY_12V, ESTOP_GPIO_PIN, RELAY_NVIDIA
     #Connect to the SQLite database 
-    conn = sqlite3.connect('/home/smur1.2/robot-landing-page/database/smur1.2_data.db')  #Connect to the database path
+    conn = sqlite3.connect('database/smur1.2_data.db')  #Connect to the database path
     cursor = conn.cursor() #Create a cursor object to interact with the database
     
     #Get the current datetime
