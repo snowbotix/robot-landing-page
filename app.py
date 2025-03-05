@@ -5,6 +5,8 @@ import socket #Socket programming to establish connection using UDP
 import json #Json for serializing and decoding the data sent in UDP
 import time #Time for asynchronous updates
 import RPi.GPIO as GPIO #GPIO pinout for Raspberry Pi Relay Controlling & Monitoring
+import datetime
+from datetime import datetime
 
 #Initialize Flask Apps into Class variables
 app = Flask(__name__) #Intialize the main app which is used for control and monitoring
@@ -17,6 +19,7 @@ discharge_status_48v = "off" #Variable to store and update the discharge status 
 discharge_status_12v = "off"#Variable to store and update the discharge status of 12V Battery
 charge_status_48v = "off"#Variable to store and update the charge status of 48V Battery
 charge_status_12v = "off"#Variable to store and update the charge status of 12V Battery
+scheduled_tasks = []
 
 # Lock for thread safety
 data_lock = threading.Lock()
@@ -43,7 +46,7 @@ GPIO.setup(RELAY_HEATING, GPIO.OUT) #Set the GPIO Pin of Heater Pad
 GPIO.setup(ESTOP_GPIO_PIN, GPIO.OUT) #Set the GPIO Pin of Estop
 
 #Initial state of relays (assume they are OFF)
-GPIO.output(RELAY_12V, GPIO.HIGH)  # 12V System off
+
 GPIO.output(ESTOP_GPIO_PIN, GPIO.LOW) # Estop as Off
 
 #Flask End Point Route API to Control the Discharge State of 48V Battery using the front end buttons
@@ -226,7 +229,45 @@ def toggle_estop():
     except Exception as e:
         print(f"Error toggling E-Stop: {e}")
         return jsonify({"success": False, "error": str(e)}), 500
+@mobile_app.route('/schedule', methods=['POST'])
+def schedule_robot():
+    # Get data from the JSON payload
+    data = request.get_json()
 
+    # Extract fields from the JSON data
+    scheduled_time = data.get('datetime')
+    name = data.get('name')
+    email = data.get('email')
+
+    # Validate the received fields
+    if not scheduled_time or not name or not email:
+        return jsonify({"error": "Missing required fields"}), 400
+
+    # Convert the scheduled time to a datetime object
+    try:
+        scheduled_time = datetime.strptime(scheduled_time, '%Y-%m-%dT%H:%M')
+    except ValueError:
+        return jsonify({"error": "Invalid date format"}), 400
+
+    # Add the schedule to the list (replace this with saving to a database)
+    scheduled_tasks.append({
+        "scheduled_time": scheduled_time,
+        "name": name,
+        "email": email
+    })
+
+    # Respond with the scheduled task confirmation
+    return jsonify({
+        "message": "Robot scheduled successfully",
+        "scheduled_time": scheduled_time.strftime('%Y-%m-%d %H:%M'),
+        "name": name,
+        "email": email
+    }), 200
+
+@mobile_app.route('/get_scheduled_tasks', methods=['GET'])
+def get_scheduled_tasks():
+    return jsonify(scheduled_tasks)
+    
 #Main function to run the app.py script
 if __name__ == '__main__':
     threading.Thread(target=udp_listener, daemon=True).start() #Start a seperate thread to receive the battery data and send commands to batteryinfo script
