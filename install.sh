@@ -6,7 +6,7 @@ set -e
 echo "Starting installation process..."
 
 
-cd /home/$USER/robot-landing-page
+cd /$HOME/robot-landing-page
 
 # Step 1: Create a virtual environment and activate it
 echo "Creating virtual environment..."
