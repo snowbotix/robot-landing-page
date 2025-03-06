@@ -24,6 +24,10 @@ cd database || { echo "Database folder not found!"; exit 1; }
 python db_setup.py
 cd ..
 
+#Step 4: Make sure the landing_page.sh is executable
+echo "Landing_page.sh is setting to executable"
+chmod +x landing_page.sh
+
 
 # Step 5: Setup systemd services
 echo "Setting up systemd services..."
