@@ -278,6 +278,22 @@ def insert_data(data_12V, data_48V):
     #Close the connection
     conn.close()
 
+#To extract the ip address dynamically for any system
+def get_ip():
+    # Run the 'ip a' command and capture the output
+    result = subprocess.check_output("ip a", shell=True).decode()
+
+    # Parse the output to find the IP address of the first non-loopback interface
+    ip_address = None
+    for line in result.splitlines():
+        # Look for lines that start with 'inet' (exclude '127.0.0.1' loopback address)
+        if line.strip().startswith('inet ') and '127.0.0.1' not in line:
+            # Extract the IP address from the line (before the '/')
+            ip_address = line.split()[1].split('/')[0]
+            break  # Exit after finding the first non-loopback IP
+
+    return ip_address
+
               
 #Main function which runs entire bms establish connection loop, receving data, sending data, inserting into database
 async def main():
@@ -303,7 +319,7 @@ async def main():
     asyncio.create_task(maintain_connection(Bms48V)) #Maintain Connection to 48V Battery
 
     #UDP Settings for back & forth communication
-    UDP_IP = "192.168.1.209" #Define the UDP IP
+    UDP_IP = get_ip() #Define the UDP IP
     UDP_PORT = 4124 #Define the UDP Port to Receive Data to app.py flask application 
     UDP_PORT2 = 4123 #Defne the UDP Port to Send & Receive Front End Data from HTML to Flask Application - App.py to this Script 
 
