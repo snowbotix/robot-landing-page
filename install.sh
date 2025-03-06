@@ -24,14 +24,8 @@ cd database || { echo "Database folder not found!"; exit 1; }
 python db_setup.py
 cd ..
 
-# Step 4: Configure & run the landingpage.sh
-echo "Configuring landing page script..."
-chmod +x landing_page.sh
 
-# Run the landing page script
-./landing_page.sh
-
-# Step 6: Setup systemd services
+# Step 5: Setup systemd services
 echo "Setting up systemd services..."
 
 # Copy the systemd service files from the repository to systemd directory
