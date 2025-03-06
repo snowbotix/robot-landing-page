@@ -302,9 +302,11 @@ async def main():
     global RELAY_HEATING, RELAY_DC_CHARGER, RELAY_12V, ESTOP_GPIO_PIN, RELAY_NVIDIA
     
     #Define the mac address of both batteries for bluetooth connection
-    JbdBms12VBatteryMacAddr = 'A5:C2:37:2B:BB:B1' #mac address of 12 V Battery (Jdb BMS) - PUPVWMHB LiFePO4 100 Ah
+    #JbdBms12VBatteryMacAddr = 'A5:C2:37:2B:BB:B1' #mac address of 12 V Battery (Jdb BMS) - PUPVWMHB LiFePO4 100 Ah
+    JbdBms12VBatteryMacAddr = 'A5:C2:37:2D:7E:EC' #mac address of 12 V Battery (Jdb BMS) - For SMUR 2.0
     #JbdBms48VBatteryMacAddr = 'A4:C1:37:41:B5:2D' #mac address of 48 V Battery (Jdb BMS) - SMUR-BAT1
-    JbdBms48VBatteryMacAddr = '10:A5:62:0F:14:74' #mac address of 48 V Battery (Jdb BMS) - SMUR-BAT2 	
+    #JbdBms48VBatteryMacAddr = '10:A5:62:0F:14:74' #mac address of 48 V Battery (Jdb BMS) - SMUR-BAT2 	
+    JbdBms48VBatteryMacAddr = '10:A5:62:0F:15:CC' #mac address of 48 V Battery (Jdb BMS) - SMUR-BAT3 
     
     #Define JBD Class with the MAC Address 
     Bms12V  = JbdBt(JbdBms12VBatteryMacAddr, name='jbd') #12V BMS JBD Class Variable
