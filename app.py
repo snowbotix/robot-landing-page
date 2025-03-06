@@ -7,11 +7,28 @@ import time #Time for asynchronous updates
 import RPi.GPIO as GPIO #GPIO pinout for Raspberry Pi Relay Controlling & Monitoring
 import datetime
 from datetime import datetime
+import subprocess
 
 #Initialize Flask Apps into Class variables
 app = Flask(__name__) #Intialize the main app which is used for control and monitoring
 mobile_app = Flask(__name__) #Intialize the mobile app for customer end to monitor the robot stats
 
+#To extract the ip address dynamically for any system
+def get_ip():
+    # Run the 'ip a' command and capture the output
+    result = subprocess.check_output("ip a", shell=True).decode()
+
+    # Parse the output to find the IP address of the first non-loopback interface
+    ip_address = None
+    for line in result.splitlines():
+        # Look for lines that start with 'inet' (exclude '127.0.0.1' loopback address)
+        if line.strip().startswith('inet ') and '127.0.0.1' not in line:
+            # Extract the IP address from the line (before the '/')
+            ip_address = line.split()[1].split('/')[0]
+            break  # Exit after finding the first non-loopback IP
+
+    return ip_address
+    
 # Initialize variables 
 battery_data = {} # Variable to store battery data 
 latest_coordinates = {"latitude":None, "longitude": None} # Variable to store latest coordinates information
@@ -25,7 +42,7 @@ scheduled_tasks = []
 data_lock = threading.Lock()
 
 #UDP Settings to communicate
-UDP_IP = "192.168.1.209" #Define the UDP IP
+UDP_IP = get_ip() #Define the UDP IP
 UDP_PORT = 4123 #Defne the UDP Port to Send & Receive Front End Data from HTML to Flask Application - App.py to batteryInfo Script
 UDP_PORT2 = 4124 #Define the UDP Port to Receive Data from batteryInfo script 
 UDP_PORT_NMEA = 8501 #Define the UDP Port for listening the GPS NMEA message from Teltonika Network
@@ -48,7 +65,7 @@ GPIO.setup(ESTOP_GPIO_PIN, GPIO.OUT) #Set the GPIO Pin of Estop
 #Initial state of relays (assume they are OFF)
 
 GPIO.output(ESTOP_GPIO_PIN, GPIO.LOW) # Estop as Off
-
+    
 #Flask End Point Route API to Control the Discharge State of 48V Battery using the front end buttons
 @app.route('/toggledischarge48v', methods=['POST'])
 def toggledischarge48v():
