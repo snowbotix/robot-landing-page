@@ -16,7 +16,7 @@ source lpenv/bin/activate
 # Step 2: Install required Python libraries
 echo "Installing required Python libraries..."
 pip install --upgrade pip
-pip install -r requirements.txt
+pip install -r requirement.txt
 
 # Step 3: Locate to the database folder and run db_setup.py
 echo "Setting up the database..."
