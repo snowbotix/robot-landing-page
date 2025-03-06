@@ -26,7 +26,7 @@ cd ..
 
 # Step 4: Configure & run the landingpage.sh
 echo "Configuring landing page script..."
-chmod +x landingpage.sh
+chmod +x landing_page.sh
 
 # Run the landing page script
 ./landing_page.sh
@@ -41,9 +41,9 @@ sudo cp ./snowbotix-tracker-app-tunnel.service /etc/systemd/system/
 # Reload systemd and enable services
 echo "Reloading systemd and enabling services..."
 sudo systemctl daemon-reload
-sudo systemctl enable service1.service
-sudo systemctl enable service2.service
-sudo systemctl start service1.service
-sudo systemctl start service2.service
+sudo systemctl enable landingpagewebapp.service
+sudo systemctl enable snowbotix-tracker-app-tunnel.service
+sudo systemctl start landingpagewebapp.service
+sudo systemctl start snowbotix-tracker-app-tunnel.service
 
 echo "Installation completed successfully!"
