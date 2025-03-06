@@ -29,7 +29,7 @@ echo "Configuring landing page script..."
 chmod +x landingpage.sh
 
 # Run the landing page script
-./landingpage.sh
+./landing_page.sh
 
 # Step 6: Setup systemd services
 echo "Setting up systemd services..."
