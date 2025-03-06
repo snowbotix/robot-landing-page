@@ -3,8 +3,8 @@ Description = Web App for Landing Page of the Robot which monitors battery and c
 After=network.target
 
 [Service]
-ExecStart = /bin/bash /home/smur1.2/robot-landing-page/landing_page.sh
-WorkingDirectory =/home/smur1.2/robot-landing-page
+ExecStart = /bin/bash $HOME/robot-landing-page/landing_page.sh
+WorkingDirectory =$HOME/robot-landing-page
 Restart=always
 User=smur1.2
 Group=smur1.2
