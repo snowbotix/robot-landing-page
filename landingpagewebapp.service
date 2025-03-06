@@ -6,8 +6,8 @@ After=network.target
 ExecStart=/bin/bash /home/smur2.0_001/robot-landing-page/landing_page.sh
 WorkingDirectory= /home/smur2.0_001/robot-landing-page
 Restart=always
-User=%u
-Group=%u
+User=smur2.0_001
+Group=smur2.0_001
 
 [Install]
 WantedBy=multi-user.target
