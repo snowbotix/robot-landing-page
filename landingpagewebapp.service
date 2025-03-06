@@ -3,11 +3,11 @@ Description = Web App for Landing Page of the Robot which monitors battery and c
 After=network.target
 
 [Service]
-ExecStart = /bin/bash $HOME/robot-landing-page/landing_page.sh
-WorkingDirectory =$HOME/robot-landing-page
+ExecStart=/bin/bash %h/robot-landing-page/landing_page.sh
+WorkingDirectory=%h/robot-landing-page
 Restart=always
-User=$USER
-Group=$USER
+User=%u
+Group=%u
 
 [Install]
 WantedBy=multi-user.target
