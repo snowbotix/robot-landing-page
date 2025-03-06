@@ -240,8 +240,16 @@ async def safe_fetch(bms, retries=5, delay=3):
 def insert_data(data_12V, data_48V):
     #define global variables for Solid State Relay Pins - BCM
     global RELAY_HEATING, RELAY_DC_CHARGER, RELAY_12V, ESTOP_GPIO_PIN, RELAY_NVIDIA
+    
+    # Get the absolute path of the current script (batteryinfo.py)
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    # Move one level up to the 'robot-landing-page' directory
+    repo_base_path = os.path.dirname(script_dir)
+    # Construct the database path dynamically
+    db_path = os.path.join(repo_base_path, "database", "smur_data.db")
+	
     #Connect to the SQLite database 
-    conn = sqlite3.connect('database/smur1.2_data.db')  #Connect to the database path
+    conn = sqlite3.connect(db_path)  #Connect to the database path
     cursor = conn.cursor() #Create a cursor object to interact with the database
     
     #Get the current datetime
