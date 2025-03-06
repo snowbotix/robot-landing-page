@@ -1,6 +1,6 @@
 import sqlite3 #import sqlite3 for integrating a database
 
-file = "smur1.2_data.db" #file name for storing the data into a database file
+file = "smur_data.db" #file name for storing the data into a database file
 
 conn = sqlite3.connect(file) #Create or connect to the database file 
 
