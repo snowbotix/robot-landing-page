@@ -240,16 +240,8 @@ async def safe_fetch(bms, retries=5, delay=3):
 def insert_data(data_12V, data_48V):
     #define global variables for Solid State Relay Pins - BCM
     global RELAY_HEATING, RELAY_DC_CHARGER, RELAY_12V, ESTOP_GPIO_PIN, RELAY_NVIDIA
-    
-    # Get the absolute path of the current script (batteryinfo.py)
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    # Move one level up to the 'robot-landing-page' directory
-    repo_base_path = os.path.dirname(script_dir)
-    # Construct the database path dynamically
-    db_path = os.path.join(repo_base_path, "database", "smur_data.db")
-	
     #Connect to the SQLite database 
-    conn = sqlite3.connect(db_path)  #Connect to the database path
+    conn = sqlite3.connect('/home/smur1.2/robot-landing-page/database/smur1.2_data.db')  #Connect to the database path
     cursor = conn.cursor() #Create a cursor object to interact with the database
     
     #Get the current datetime
@@ -286,22 +278,6 @@ def insert_data(data_12V, data_48V):
     #Close the connection
     conn.close()
 
-#To extract the ip address dynamically for any system
-def get_ip():
-    # Run the 'ip a' command and capture the output
-    result = subprocess.check_output("ip a", shell=True).decode()
-
-    # Parse the output to find the IP address of the first non-loopback interface
-    ip_address = None
-    for line in result.splitlines():
-        # Look for lines that start with 'inet' (exclude '127.0.0.1' loopback address)
-        if line.strip().startswith('inet ') and '127.0.0.1' not in line:
-            # Extract the IP address from the line (before the '/')
-            ip_address = line.split()[1].split('/')[0]
-            break  # Exit after finding the first non-loopback IP
-
-    return ip_address
-
               
 #Main function which runs entire bms establish connection loop, receving data, sending data, inserting into database
 async def main():
@@ -310,11 +286,9 @@ async def main():
     global RELAY_HEATING, RELAY_DC_CHARGER, RELAY_12V, ESTOP_GPIO_PIN, RELAY_NVIDIA
     
     #Define the mac address of both batteries for bluetooth connection
-    #JbdBms12VBatteryMacAddr = 'A5:C2:37:2B:BB:B1' #mac address of 12 V Battery (Jdb BMS) - PUPVWMHB LiFePO4 100 Ah
-    JbdBms12VBatteryMacAddr = 'A5:C2:37:2D:7E:EC' #mac address of 12 V Battery (Jdb BMS) - For SMUR 2.0
-    #JbdBms48VBatteryMacAddr = 'A4:C1:37:41:B5:2D' #mac address of 48 V Battery (Jdb BMS) - SMUR-BAT1
+    JbdBms12VBatteryMacAddr = 'A5:C2:37:2B:BB:B1' #mac address of 12 V Battery (Jdb BMS) - PUPVWMHB LiFePO4 100 Ah
+    JbdBms48VBatteryMacAddr = 'A4:C1:37:41:B5:2D' #mac address of 48 V Battery (Jdb BMS) - SMUR-BAT1
     #JbdBms48VBatteryMacAddr = '10:A5:62:0F:14:74' #mac address of 48 V Battery (Jdb BMS) - SMUR-BAT2 	
-    JbdBms48VBatteryMacAddr = '10:A5:62:0F:15:CC' #mac address of 48 V Battery (Jdb BMS) - SMUR-BAT3 
     
     #Define JBD Class with the MAC Address 
     Bms12V  = JbdBt(JbdBms12VBatteryMacAddr, name='jbd') #12V BMS JBD Class Variable
@@ -329,7 +303,7 @@ async def main():
     asyncio.create_task(maintain_connection(Bms48V)) #Maintain Connection to 48V Battery
 
     #UDP Settings for back & forth communication
-    UDP_IP = get_ip() #Define the UDP IP
+    UDP_IP = "192.168.1.209" #Define the UDP IP
     UDP_PORT = 4124 #Define the UDP Port to Receive Data to app.py flask application 
     UDP_PORT2 = 4123 #Defne the UDP Port to Send & Receive Front End Data from HTML to Flask Application - App.py to this Script 
 
@@ -364,9 +338,16 @@ async def main():
     await Bms48V.set_switch('charge',False) #Set the 48V Battery Charge as OFF
     await Bms12V.set_switch('charge',False) #Set the 12V Battery Charge as OFF
     await Bms12V.set_switch('discharge',True) #Set the 12V Battery Dicharge as ON
+    
+    #Set the time variables 
+    insert_interval = 2  # Initial interval set to 2 seconds
+    last_insert_time = 0  # To track when data was last inserted
 
     #Enter into the loop for Data Extraction, Supply, Auto Charging & Storage of Data
     while True:
+    
+        #Store the current time to track
+        current_time = time.time()
 
         #Fetch the battery data
         Data_12V = await safe_fetch(Bms12V) #Fetch the 12V Battery Data and store it in a Dict Vairable 
@@ -383,27 +364,37 @@ async def main():
         B_48V_Switch_State = Data_48V.switches #Store the 48V Battery Switch states into a variable 
         B_48V_Switch_State_Discharge = Data_48V.switches['discharge'] #Store the 48V Battery discharge switch state into a variable
         
-        #Insert/Store the data into database by calling the insert_data function 
-        insert_data(Data_12V, Data_48V)
+        print(GPIO.input(ESTOP_GPIO_PIN))
+       # GPIO-based interval logic for database insertion
+        if GPIO.input(ESTOP_GPIO_PIN):  # GPIO Pin HIGH
+            insert_interval = 2
+        else:  # GPIO Pin LOW
+            insert_interval = 300  # 5 minutes
+    
+        # Insert data only if the interval has elapsed
+        if current_time - last_insert_time >= insert_interval:
+            insert_data(Data_12V, Data_48V)
+            last_insert_time = current_time
+            print(f"Inserted Data at {datetime.datetime.now()}")
         
-        # Print the fetched data to the console for debugging
-        print("Battery 12V Data:")
-        print(f"Voltage: {Data_12V.voltage} V")
-        print(f"Current: {Data_12V.current} A")
-        print(f"State of Charge (SOC): {Data_12V.soc}%")
-        print(f"Capacity: {Data_12V.capacity} Ah")
-        print(f"Temperature: {Data_12V.temperatures} °C")
-        print(f"Cycles: {Data_12V.num_cycles}")
-        print(f"Switches: {Data_12V.switches}")
+        ## Print the fetched data to the console for debugging
+        #print("Battery 12V Data:")
+        #print(f"Voltage: {Data_12V.voltage} V")
+        #print(f"Current: {Data_12V.current} A")
+        #print(f"State of Charge (SOC): {Data_12V.soc}%")
+        #print(f"Capacity: {Data_12V.capacity} Ah")
+        #print(f"Temperature: {Data_12V.temperatures} °C")
+        #print(f"Cycles: {Data_12V.num_cycles}")
+        #print(f"Switches: {Data_12V.switches}")
         
-        print("\nBattery 48V Data:")
-        print(f"Voltage: {Data_48V.voltage} V")
-        print(f"Current: {Data_48V.current} A")
-        print(f"State of Charge (SOC): {Data_48V.soc}%")
-        print(f"Capacity: {Data_48V.capacity} Ah")
-        print(f"Temperature: {Data_48V.temperatures} °C")
-        print(f"Cycles: {Data_48V.num_cycles}")
-        print(f"Switches: {Data_48V.switches}")
+        #print("\nBattery 48V Data:")
+        #print(f"Voltage: {Data_48V.voltage} V")
+        #print(f"Current: {Data_48V.current} A")
+        #print(f"State of Charge (SOC): {Data_48V.soc}%")
+        #print(f"Capacity: {Data_48V.capacity} Ah")
+        #print(f"Temperature: {Data_48V.temperatures} °C")
+        #print(f"Cycles: {Data_48V.num_cycles}")
+        #print(f"Switches: {Data_48V.switches}")
 
         #store the data into a format like json dict variable to be sent over UDP
         battery_data =  {
